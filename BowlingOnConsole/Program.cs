@@ -18,7 +18,7 @@ namespace BowlingOnConsole
             {
                 for (int numroll = 0; numroll < numRolls[frame - 1]; numroll++)
                 {
-                    int result = getRandomBowlingScore(pinsLeft);
+                    int result =  getRandomBowlingScore(pinsLeft);
 
                     game.Roll(result);
                     pinsLeft -= result;
@@ -187,7 +187,6 @@ namespace BowlingOnConsole
                         }
                     }
                 }
-
                 PrintRow(storedVal);
             }
             Console.WriteLine(new string('-', tableWidth));
@@ -222,55 +221,92 @@ namespace BowlingOnConsole
         private static void PrintStatusMessage(int result, int pinsLeft, int frame, int roll)
         {
             roll++;
+            Console.Write($"Frame:{frame}. Roll:{roll} ");
             if (frame != 10)
             {
                 if (isStrike(result))
                 {
-                    Console.WriteLine($"Frame:{frame}. Roll:{roll} :Strike! You hit {result} pins and have {pinsLeft} left.");
-                    Console.WriteLine("Resetting pins. Press Enter to roll again.");
-
+                    PrintStrikeSpareOrOpenFrame(" Strike ", result, pinsLeft, roll, frame);
                 }
                 else if (isSpare(result, pinsLeft))
                 {
-                    Console.WriteLine($"Frame {frame}. Roll:{roll} :Spare! You hit {result} pins and have {pinsLeft} left.");
-                    Console.WriteLine("Resetting pins. Press Enter to roll again.");
+                    PrintStrikeSpareOrOpenFrame(" Spare ", result, pinsLeft, roll, frame);
                 }
                 else
                 {
-                    Console.WriteLine($"Frame {frame}. Roll:{roll}: Open frame. You hit {result} pins and have {pinsLeft} left. ");
-                    if (roll == 2) { Console.WriteLine("Resetting pins. Press Enter to roll again."); }
+                    PrintStrikeSpareOrOpenFrame(" Open Frame ", result, pinsLeft, roll, frame);
                 }
             }
             else  //frame 10
             {
-                if (roll == 3 && pinsLeft > 0)
+                if (isStrike(result))
                 {
-                    Console.WriteLine($"Frame {frame}. Roll:{roll} :Open Frame! You hit {result} pins and have {pinsLeft} left. \n\n Game Over \n\n Press Enter to view your score.");
+                    PrintStrikeSpareOrOpenFrame(" Strike ", result, pinsLeft, roll, frame);
+                   
                 }
-                else if (roll == 2 && pinsLeft > 0)
+                else if (isSpare(result, pinsLeft))
                 {
-                    Console.WriteLine($"Frame {frame}. Roll:{roll} :Open Frame! You hit {result} pins and have {pinsLeft} left. \n\n Game Over \n\n Press Enter to view your score.");
+                    PrintStrikeSpareOrOpenFrame(" Spare ", result, pinsLeft, roll, frame);
                 }
                 else
                 {
-                    if (isStrike(result))
-                    {
-                        Console.WriteLine($"Frame {frame}. Roll:{roll} :Strike! You hit {result} pins and have {pinsLeft} left.");
-                        Console.WriteLine("Resetting pins. Press Enter to roll again.");
-                    }
-                    else if (isSpare(result, pinsLeft))
-                    {
-                        Console.WriteLine($"Frame {frame}. Roll:{roll} :Spare! You hit {result} pins and have {pinsLeft} left.");
-                        Console.WriteLine("Resetting pins. Press Enter to roll again.");
+                    PrintStrikeSpareOrOpenFrame(" Open Frame ", result, pinsLeft, roll, frame);
+                }
+               
+            }
+            Console.ReadLine();
+        }
+        private static void PrintResultAndPinsLeft(int result, int pinsLeft)
+        {
+            Console.WriteLine($"You hit {result} pins and have {pinsLeft} left. ");
+        }
+        private static void PrintPinReset()
+        {
+            Console.WriteLine("Resetting pins. Press Enter to roll again. ");
+        }
+        private static void PrintGameOverMessage()
+        {
+            Console.WriteLine("\n\n Game Over \n\n Press Enter to view your score.");
+        }
+        private static void PrintStrikeSpareOrOpenFrame(string rollType, int result, int pinsLeft, int roll, int frame)
+        {
+            Console.Write(rollType);
+            PrintResultAndPinsLeft(result, pinsLeft);
+            if (frame != 10)
+            {
+                if (isStrike(result) | roll == 2)
+                {
+                    PrintPinReset();
+                }
+            }
+            else
+            {
+                if (isStrike(result)) {
 
-                    }
-                    else
+                    if (roll == 1 | roll == 2)
                     {
-                        Console.WriteLine($"Frame {frame}. Roll:{roll} :Open frame. You hit {result} pins and have {pinsLeft} left. ");
+                        PrintPinReset();
+                    }
+                    else if(roll == 3)
+                    {
+                        PrintGameOverMessage();
+                    }
+                }
+                else if (isSpare(result, pinsLeft))
+                {
+                    if (roll == 3 && pinsLeft > 0)
+                    {
+                        PrintGameOverMessage();
+                    }
+                }
+                else
+                {
+                    if(roll ==2 | roll == 3)
+                    {
+                        PrintGameOverMessage();
                     }
                 }
             }
-            Console.ReadLine();
         }
 
         private static bool isSpare(int result, int pinsLeft)
